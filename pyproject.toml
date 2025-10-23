@@ -1,0 +1,42 @@
+[project]
+name = "parliament-interests-mcp"
+version = "0.1.0"
+description = "MCP server for UK Parliament Register of Interests API"
+authors = [{name = "Jeremiah Wangaruro", email = "jeremiah.ruro@gmail.com"}]
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "mcp[cli]>=1.0.0",
+    "httpx>=0.25.0",
+    "pydantic>=2.0.0",
+    "tenacity>=9.1.2",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+    "black>=23.0.0",
+    "ruff>=0.1.0",
+]
+
+[project.scripts]
+parliament-interests-mcp = "src.server:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]
+
+[tool.black]
+line-length = 88
+target-version = ['py311']
+
+[tool.ruff]
+line-length = 88
+target-version = "py311"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"

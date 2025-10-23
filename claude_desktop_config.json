@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "server": {
+      "command": "c:\\users\\wajer\\.local\\bin\\uv.EXE",
+      "args": [
+        "run",
+        "--with",
+        "mcp[cli]",
+        "mcp",
+        "run",
+        "C:\\Users\\Wajer\\CascadeProjects\\parliament-interests-mcp\\src\\server.py:main"
+      ]
+    }
+  }
+}
