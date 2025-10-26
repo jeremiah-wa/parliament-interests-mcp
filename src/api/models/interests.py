@@ -139,7 +139,7 @@ class PublishedInterest(BaseAPIModel):
     category: PublishedCategory | None = pyd.Field(
         default=None, description="Interest category"
     )
-    register: PublishedRegister | None = pyd.Field(default=None, description="Register")
+    published_register: PublishedRegister | None = pyd.Field(default=None, alias="register", description="Register")
     fields: list[Field] | None = pyd.Field(default=None, description="Interest fields")
     child_interests: list["PublishedInterest"] | None = pyd.Field(
         default=None, alias="childInterests", description="Child interests"
