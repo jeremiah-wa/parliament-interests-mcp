@@ -24,3 +24,7 @@ async def get_members(
     params: MemberSearchParams | None = None,
 ) -> MemberMembersServiceSearchResult:
     return await client.get_members(params)
+
+
+if __name__ == "__main__":
+    mcp.run()
