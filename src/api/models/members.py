@@ -29,12 +29,22 @@ class MemberStatus(int, Enum):
     DECEASED = 3
 
 
+class Status(int, Enum):
+    """Status enumeration."""
+
+    FLAG_0 = 0
+    FLAG_1 = 1
+    FLAG_2 = 2
+    FLAG_3 = 3
+
+
 class GovernmentType(int, Enum):
     """Government type enumeration."""
 
-    GOVERNMENT = 0
-    OPPOSITION = 1
-    OTHER = 2
+    TYPE_0 = 0
+    TYPE_1 = 1
+    TYPE_2 = 2
+    TYPE_3 = 3
 
 
 class MatchedBy(int, Enum):
@@ -95,13 +105,24 @@ class Party(BaseAPIModel):
     )
 
 
+class MembershipStatus(BaseAPIModel):
+    status_is_active: bool = Field(default=False, alias="statusIsActive")
+    status_description: str | None = Field(default=None, alias="statusDescription")
+    status_notes: str | None = Field(default=None, alias="statusNotes")
+    status_id: int = Field(default=0, alias="statusId")
+    status: int | None = Field(default=None, description="Status of the member")
+    status_start_date: datetime | None = Field(
+        default=None, alias="statusStartDate", description="Start date of the status"
+    )
+
+
 class HouseMembership(BaseAPIModel):
     """House membership information from Members API."""
 
     membership_from: str | None = Field(
         default=None, alias="membershipFrom", description="Membership from description"
     )
-    membership_from_id: str | None = Field(
+    membership_from_id: int | None = Field(
         default=None, alias="membershipFromId", description="Membership from ID"
     )
     house: House | None = Field(
@@ -130,7 +151,7 @@ class HouseMembership(BaseAPIModel):
         alias="membershipEndReasonNotes",
         description="End reason notes of membership",
     )
-    membership_status: str | None = Field(
+    membership_status: MembershipStatus | None = Field(
         default=None, alias="membershipStatus", description="Membership status"
     )
 

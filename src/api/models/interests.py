@@ -211,11 +211,11 @@ class InterestsParams(BaseParams):
     sort_order: InterestsSortOrder | None = pyd.Field(
         default=None, description="Sort order for results", alias="SortOrder"
     )
-    expand_child_interests: bool | None = pyd.Field(
+    expand_child_interests: bool = pyd.Field(
         default=True, description="Expand child interests", alias="ExpandChildInterests"
     )
 
     @pyd.field_serializer("expand_child_interests")
-    def serialize_expand_child_interests(self, value: bool | None) -> str | None:
+    def serialize_expand_child_interests(self, value: bool) -> str:
         """Convert boolean to lowercase string for HTTP query parameters."""
-        return str(value).lower() if value is not None else None
+        return str(value).lower()

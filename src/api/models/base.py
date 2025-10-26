@@ -1,14 +1,18 @@
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 class BaseAPIModel(BaseModel):
     """Base model for API data."""
 
-    class Config:
-        """Pydantic config."""
+    model_config = ConfigDict(
+        extra="ignore",
+        populate_by_name=True,
+    )
 
-        extra = "ignore"
-        allow_population_by_field_name = True
+    @field_validator("*", mode="before")
+    def str_none_to_none(cls, value):
+        """Convert string 'None' to actual None."""
+        return None if value == "None" else value
 
 
 class BaseParams(BaseModel):
@@ -19,9 +23,10 @@ class BaseParams(BaseModel):
         default=20, ge=1, le=20, description="Number of records to return", alias="Take"
     )
 
-    @field_validator("take", mode="before")
-    def validate_take(cls, value):
-        return min(value, 20)
+    model_config = ConfigDict(
+        extra="ignore",
+        populate_by_name=True,
+    )
 
 
 class BaseMember(BaseAPIModel):
