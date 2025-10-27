@@ -2,7 +2,6 @@
 
 import httpx
 import logging
-import sys
 from typing import Any
 from tenacity import (
     retry, 
@@ -20,8 +19,7 @@ from .models.members import (
     MemberSearchParams,
 )
 
-logging.basicConfig(stream=sys.stdout, level=logging.INFO)
-
+# Note: Logging configuration is handled in server.py to avoid conflicts
 logger = logging.getLogger(__name__)
 
 class ParliamentAPIClient:
@@ -47,16 +45,22 @@ class ParliamentAPIClient:
         self, url: str, params: dict[str, Any] | None = None
     ) -> dict[str, Any]:
         """Make HTTP request with retry logic."""
-
+        logger.debug(f"Making request to {url} with params: {params}")
+        
         async with httpx.AsyncClient(timeout=self.timeout) as client:
             response = await client.get(url, headers=self.headers, params=params)
-
             try:
                 response.raise_for_status()
+                result = response.json()
+                return result
             except httpx.HTTPStatusError as e:
-                logger.error(e.response.json())
+                error_detail = "Unknown error"
+                try:
+                    error_detail = e.response.json()
+                except Exception:
+                    error_detail = e.response.text
+                logger.error(f"HTTP error {e.response.status_code} for {response.request.url}: {error_detail}")
                 raise
-            return response.json()
 
 
     async def get_interests(

@@ -1,3 +1,5 @@
+import logging
+import sys
 from mcp.server.fastmcp import FastMCP
 from src.api.client import ParliamentAPIClient
 from src.api.models import (
@@ -6,6 +8,14 @@ from src.api.models import (
     MemberSearchParams,
     MemberMembersServiceSearchResult,
 )
+
+logging.basicConfig(
+    stream=sys.stderr,
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+)
+
+logger = logging.getLogger(__name__)
 
 mcp = FastMCP(name="parliament-interests")
 
@@ -16,15 +26,25 @@ client = ParliamentAPIClient()
 async def get_interests(
     params: InterestsParams | None = None,
 ) -> PublishedInterestApiLinkedSearchResult:
-    return await client.get_interests(params)
+    """Get parliamentary interests data."""
+    result = await client.get_interests(params)
+    return result
+
 
 
 @mcp.tool()
 async def get_members(
     params: MemberSearchParams | None = None,
 ) -> MemberMembersServiceSearchResult:
-    return await client.get_members(params)
+    """Get parliamentary members data."""
+    result = await client.get_members(params)
+    return result
+
+
+def main():
+    """Main entry point for the MCP server."""
+    mcp.run()
 
 
 if __name__ == "__main__":
-    mcp.run()
+    main()
