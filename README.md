@@ -12,7 +12,7 @@ An MCP (Model Context Protocol) server that provides access to the UK Parliament
 ## Installation
 
 ### Prerequisites
-- Python 3.9+
+- Python 3.11+
 - [uv](https://docs.astral.sh/uv/getting-started/installation/) package manager
 
 ### Setup
@@ -78,67 +78,58 @@ Edit `~/.config/claude/claude_desktop_config.json`:
 
 ## Available Tools
 
-### `get_interest_categories`
-Get all interest categories from the Parliament register.
+### `get_interests`
+Search and retrieve interest records from the Parliament Register of Interests with comprehensive filtering options.
 
-**Parameters:**
-- `skip` (optional): Number of records to skip for pagination
-- `take` (optional): Number of records to return (max 100)
+**Parameters (all optional):**
+- `member_id` (int): Filter by specific MP ID
+- `category_id` (int): Filter by interest category ID  
+- `published_from` (date): Filter interests published from this date (YYYY-MM-DD format)
+- `published_to` (date): Filter interests published to this date (YYYY-MM-DD format)
+- `sort_order` (string): Sort order - "PublishingDateDescending" or "CategoryAscending"
+- `expand_child_interests` (bool): Whether to expand child interests (default: true)
+- `skip` (int): Number of records to skip for pagination (default: 0)
+- `take` (int): Number of records to return (default: 20, max: 100)
 
-### `get_category_details`
-Get detailed information about a specific interest category.
+**Returns:** Complete interest records including member details, categories, registration dates, field values, and donor information.
 
-**Parameters:**
-- `category_id` (required): The ID of the category to retrieve
+### `get_members`
+Search and retrieve MP information with extensive search and filtering capabilities.
 
-### `search_members`
-Search for MPs by name or get all members.
+**Parameters (all optional):**
+- `name` (string): Search members by name (partial matches supported)
+- `location` (string): Search by postcode, constituency, or geographical location
+- `post_title` (string): Filter by government post or role held
+- `party_id` (int): Filter by political party ID
+- `house` (int): Filter by House (1=Commons, 2=Lords)
+- `constituency_id` (int): Filter by constituency ID
+- `name_starts_with` (string): Filter by surname starting with specified letters
+- `gender` (string): Filter by gender
+- `membership_started_since` (datetime): Members who started on or after date
+- `membership_ended_since` (datetime): Members who left on or after date
+- `was_member_on_or_after` (datetime): Members active on or after date
+- `was_member_on_or_before` (datetime): Members active on or before date
+- `is_current_member` (bool): Filter for currently active members
+- `is_eligible` (bool): Filter for members eligible to sit
+- `policy_interest_id` (int): Filter by policy interest area
+- `experience` (string): Filter by professional experience
+- `skip` (int): Number of records to skip for pagination (default: 0)
+- `take` (int): Number of records to return (default: 20, max: 100)
 
-**Parameters:**
-- `name` (optional): Name of the MP to search for
-- `skip` (optional): Number of records to skip for pagination
-- `take` (optional): Number of records to return (max 100)
-
-### `get_member_details`
-Get detailed information about a specific MP.
-
-**Parameters:**
-- `member_id` (required): The ID of the member to retrieve
-
-### `search_interests`
-Search for interest records with various filters.
-
-**Parameters:**
-- `member_id` (optional): Filter by specific MP ID
-- `category_id` (optional): Filter by interest category ID
-- `from_date` (optional): Filter interests from this date (YYYY-MM-DD format)
-- `to_date` (optional): Filter interests to this date (YYYY-MM-DD format)
-- `skip` (optional): Number of records to skip for pagination
-- `take` (optional): Number of records to return (max 100)
-
-### `get_interest_details`
-Get detailed information about a specific interest record.
-
-**Parameters:**
-- `interest_id` (required): The ID of the interest record to retrieve
-
-### `search_by_donor`
-Search for interests by donor name or company.
-
-**Parameters:**
-- `donor_name` (required): Name of the donor to search for
-- `skip` (optional): Number of records to skip for pagination
-- `take` (optional): Number of records to return (max 100)
+**Returns:** Complete member profiles including personal details, constituencies, party affiliations, and parliamentary roles.
 
 ## Example Usage
 
 Once configured in Claude Desktop, you can ask questions like:
 
-- "What are the different types of interest categories in Parliament?"
 - "Show me all interests registered by [MP Name]"
-- "Find all donations from [Company Name]"
-- "What employment interests has [MP Name] declared?"
-- "Show me all interests in the 'Gifts and benefits' category from the last year"
+- "Find all recent donations and gifts to MPs"
+- "What employment interests have been declared in the last 6 months?"
+- "Search for MPs from [Constituency/Location]"
+- "Show me all interests in category [Category ID] published since [Date]"
+- "Find MPs who have held the position of [Government Role]"
+- "What are the most recent interest registrations?"
+- "Search for interests related to [Company/Organization Name]"
 
 ## API Data
 
