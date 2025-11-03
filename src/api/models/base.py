@@ -6,7 +6,8 @@ class BaseAPIModel(BaseModel):
 
     model_config = ConfigDict(
         extra="ignore",
-        populate_by_name=True,
+        validate_by_name=True,
+        validate_by_alias=True
     )
 
     @field_validator("*", mode="before")
@@ -25,7 +26,8 @@ class BaseParams(BaseModel):
 
     model_config = ConfigDict(
         extra="ignore",
-        populate_by_name=True,
+        validate_by_name=True,
+        validate_by_alias=True
     )
 
 
@@ -42,12 +44,6 @@ class BaseMember(BaseAPIModel):
         default=None,
         alias="nameDisplayAs",
         description="Member's current full name, as it should be displayed in text",
-    )
-    name_full_title: str | None = Field(
-        default=None, alias="nameFullTitle", description="Member's full title"
-    )
-    name_address_as: str | None = Field(
-        default=None, alias="nameAddressAs", description="Member's name for addressing"
     )
 
 

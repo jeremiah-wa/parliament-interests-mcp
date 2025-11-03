@@ -7,7 +7,7 @@ https://interests-api.parliament.uk/swagger/v1/swagger.json
 
 from datetime import date
 from enum import Enum
-from typing import Any
+from typing import Any, Generic, TypeVar
 import pydantic as pyd
 
 from .base import BaseAPIModel, BaseMember, Link, BaseParams
@@ -53,7 +53,7 @@ class Field(BaseAPIModel):
 
 
 class Member(BaseMember):
-    """Member model for interests from Interests API."""
+    """Member of Parliament who has registered the interest"""
 
     house: str | None = pyd.Field(
         default=None,
@@ -64,7 +64,7 @@ class Member(BaseMember):
     )
     party: str | None = pyd.Field(
         default=None,
-        description="Party the Member is currently associated with (simple string)",
+        description="Party the Member is currently associated with",
     )
     links: list[Link] | None = pyd.Field(
         default=None,
@@ -73,7 +73,7 @@ class Member(BaseMember):
 
 
 class PublishedCategory(BaseAPIModel):
-    """Published category from Interests API."""
+    """Category an interest can be registered with."""
 
     id: int = pyd.Field(description="ID of the category")
     number: str | None = pyd.Field(
@@ -115,21 +115,31 @@ class PublishedRegister(BaseAPIModel):
 
 
 class PublishedInterest(BaseAPIModel):
-    """Published interest from Interests API."""
+    """Version of an interest which has been published."""
 
     id: int = pyd.Field(description="ID of the interest")
-    summary: str | None = pyd.Field(default=None, description="Summary of the interest")
+    summary: str | None = pyd.Field(
+        default=None, description="Title Summary for the interest."
+    )
     parent_interest_id: int | None = pyd.Field(
-        default=None, alias="parentInterestId", description="Parent interest ID"
+        default=None,
+        alias="parentInterestId",
+        description="The unique ID for the payer (parent interest) to which this payment (child interest) is associated.",
     )
     registration_date: date | None = pyd.Field(
-        default=None, alias="registrationDate", description="Registration date"
+        default=None,
+        alias="registrationDate",
+        description="Registration Date on the published interest.",
     )
     published_date: date | None = pyd.Field(
-        default=None, alias="publishedDate", description="Published date"
+        default=None,
+        alias="publishedDate",
+        description="Date when the interest was first published.",
     )
     updated_dates: list[date] | None = pyd.Field(
-        default=None, alias="updatedDates", description="Updated dates"
+        default=None,
+        alias="updatedDates",
+        description="A list of dates on which the interest has been updated since it has been published.",
     )
 
     # Related objects
@@ -139,7 +149,9 @@ class PublishedInterest(BaseAPIModel):
     category: PublishedCategory | None = pyd.Field(
         default=None, description="Interest category"
     )
-    published_register: PublishedRegister | None = pyd.Field(default=None, alias="register", description="Register")
+    published_register: PublishedRegister | None = pyd.Field(
+        default=None, alias="register", description="Register"
+    )
     fields: list[Field] | None = pyd.Field(default=None, description="Interest fields")
     child_interests: list["PublishedInterest"] | None = pyd.Field(
         default=None, alias="childInterests", description="Child interests"
@@ -156,20 +168,40 @@ class PublishedInterest(BaseAPIModel):
 
 
 # Search Result Models
-class PublishedInterestApiLinkedSearchResult(BaseAPIModel):
-    """Search result for published interests from Interests API."""
 
-    skip: int = pyd.Field(default=0, description="Skip value")
-    take: int = pyd.Field(default=20, description="Take value")
-    total_results: int = pyd.Field(
-        default=0, alias="totalResults", description="Total results"
+T = TypeVar("T", bound=BaseAPIModel)
+
+
+class ApiLinkedSearchResult(BaseAPIModel, Generic[T]):
+    """Paginated search result for published categories with HATEOAS links."""
+
+    skip: int = pyd.Field(
+        default=0, description="The skip value that was used in the query."
     )
-    items: list[PublishedInterest] | None = pyd.Field(
-        default=None, description="List of interests"
+    take: int = pyd.Field(
+        default=20, description="The take value that was used in the query."
+    )
+    total_results: int = pyd.Field(
+        default=0,
+        alias="totalResults",
+        description="The total number of results that matched the query.",
+    )
+    items: list[T] | None = pyd.Field(
+        default=None,
+        description="The list of items found for the specified page (by requested skip and take)",
     )
     links: list[Link] | None = pyd.Field(
-        default=None, description="Links to related resources"
+        default=None,
+        description="A list of HATEOAS Links for navigating through the paginated result.",
     )
+
+
+class PublishedInterestApiLinkedSearchResult(ApiLinkedSearchResult[PublishedInterest]):
+    """Paginated search result for published interests with HATEOAS links."""
+
+
+class PublishedCategoryApiLinkedSearchResult(ApiLinkedSearchResult[PublishedCategory]):
+    """Paginated search result for published categories with HATEOAS links."""
 
 
 class ApiResponseErrorType(str, Enum):

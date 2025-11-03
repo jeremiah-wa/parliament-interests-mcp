@@ -7,7 +7,7 @@ https://members-api.parliament.uk/swagger/v1/swagger.json
 
 from datetime import datetime
 from enum import Enum
-
+from typing import TypeVar, Generic
 from pydantic import Field
 
 from .base import BaseAPIModel, Link, BaseMember, BaseParams
@@ -159,6 +159,12 @@ class HouseMembership(BaseAPIModel):
 class Member(BaseMember):
     """Member model from Members API."""
 
+    name_full_title: str | None = Field(
+        default=None, alias="nameFullTitle", description="Member's full title"
+    )
+    name_address_as: str | None = Field(
+        default=None, alias="nameAddressAs", description="Member's name for addressing"
+    )
     latest_party: Party | None = Field(
         default=None, alias="latestParty", description="Latest party affiliation"
     )
@@ -175,19 +181,111 @@ class Member(BaseMember):
     )
 
 
-class MemberItem(BaseAPIModel):
-    """Wrapper for member data."""
+class DebateContribution(BaseAPIModel):
+    """Debate contribution model from Members API."""
 
-    value: Member | None = Field(default=None, description="Member data")
+    total_contributions: int = Field(
+        default=0,
+        alias="totalContributions",
+        description="Total number of contributions",
+    )
+    debate_title: str | None = Field(
+        default=None, alias="debateTitle", description="Title of the debate"
+    )
+    debate_id: int = Field(default=0, alias="debateId", description="ID of the debate")
+    debate_website_id: str | None = Field(
+        default=None, alias="debateWebsiteId", description="Website ID of the debate"
+    )
+    sitting_date: datetime = Field(
+        alias="sittingDate", description="Date of the sitting"
+    )
+    section: str | None = Field(default=None, description="Section of the debate")
+    house: str | None = Field(default=None, description="House where debate occurred")
+    first_timecode: datetime | None = Field(
+        default=None,
+        alias="firstTimecode",
+        description="Timecode of first contribution",
+    )
+    speech_count: int = Field(
+        default=0, alias="speechCount", description="Number of speeches"
+    )
+    question_count: int = Field(
+        default=0, alias="questionCount", description="Number of questions"
+    )
+    supplementary_question_count: int = Field(
+        default=0,
+        alias="supplementaryQuestionCount",
+        description="Number of supplementary questions",
+    )
+    intervention_count: int = Field(
+        default=0, alias="interventionCount", description="Number of interventions"
+    )
+    answer_count: int = Field(
+        default=0, alias="answerCount", description="Number of answers"
+    )
+    points_of_order_count: int = Field(
+        default=0, alias="pointsOfOrderCount", description="Number of points of order"
+    )
+    statements_count: int = Field(
+        default=0, alias="statementsCount", description="Number of statements"
+    )
+
+class RegisteredInterest(BaseAPIModel):
+    """Interest model from Members API."""
+    id: int = Field(default=0, description="ID of the interest")
+    interest: str | None = Field(default=None, description="Interest")
+    sort_order: int | None = Field(default=None, alias="sortOrder", description="Sort order of the interest")
+    created_when: datetime | None = Field(default=None, alias="createdWhen", description="Created when")
+    last_amended_when: datetime | None = Field(default=None, alias="lastAmendedWhen", description="Last amended when")
+    deleted_when: datetime | None = Field(default=None, alias="deletedWhen", description="Deleted when")
+    is_correction: bool = Field(default=False, alias="isCorrection", description="Is correction")
+    child_interests: list["RegisteredInterest"] | None = Field(default=None, alias="childInterests", description="Child interests")
+    
+    
+
+class RegisteredInterestCategory(BaseAPIModel):
+    """Interest category model from Members API."""
+    id: int = Field(default=0, description="ID of the interest category")
+    name: str | None = Field(default=None, description="Name of the interest category")
+    sort_order: int | None = Field(default=None, alias="sortOrder", description="Sort order of the interest category")
+    interests: list[RegisteredInterest] | None = Field(default=None, description="Interests")
+    
+
+class MembersInterests(BaseAPIModel):
+    """Members interests model from Members API."""
+    member: Member | None = Field(default=None, description="Member")
+    interest_categories: list[RegisteredInterestCategory] | None = Field(default=None, alias="interestCategories", description="Interest categories")
+    
+
+G = TypeVar("G", bound=BaseAPIModel)
+
+
+class Item(BaseAPIModel, Generic[G]):
+    value: G | None = Field(default=None, description="Resource")
     links: list[Link] | None = Field(
         default=None, description="Links to related resources"
     )
 
 
-class MemberMembersServiceSearchResult(BaseAPIModel):
+class MemberItem(Item[Member]):
+    """Wrapper for member data."""
+
+
+class DebateContributionItem(Item[DebateContribution]):
+    """Wrapper for debate contribution data."""
+
+
+class MembersInterestsItem(Item[MembersInterests]):
+    """Wrapper for member interests data."""
+
+
+T = TypeVar("T", bound=BaseAPIModel)
+
+
+class MembersServiceSearchResult(BaseAPIModel, Generic[T]):
     """Search result for members from Members API."""
 
-    items: list[MemberItem] | None = Field(default=None, description="List of members")
+    items: list[T] | None = Field(default=None, description="List of members")
     total_results: int = Field(
         default=0, alias="totalResults", description="Total results"
     )
@@ -199,11 +297,31 @@ class MemberMembersServiceSearchResult(BaseAPIModel):
     links: list[Link] | None = Field(
         default=None, description="Links to related resources"
     )
-    result_type: MatchedBy | None = Field(
+    result_type: str | None = Field(
         default=None, alias="resultType", description="How the results were matched"
     )
 
 
+class MemberMembersServiceSearchResult(MembersServiceSearchResult[MemberItem]):
+    """Search result for members from Members API."""
+
+
+class DebateContributionMembersServiceSearchResult(
+    MembersServiceSearchResult[DebateContributionItem]
+):
+    """Search result for debate contributions from Members API."""
+
+
+class MembersInterestsMembersServiceSearchResult(MembersServiceSearchResult[MembersInterestsItem]):
+    """Search result for members interests from Members API."""
+
+
+class LordsInterestsRegisterParams(BaseAPIModel):
+    search_term: str | None = Field(default=None, alias="searchTerm", description="Registered interests containing search term")
+    page: int | None = Field(default=None, description="Page of results to return, default 0. Results per page 20.r")
+    include_deleted: bool = Field(default=False, alias="includeDeleted", description="Registered interests that have been deleted")
+
+    
 class MemberSearchParams(BaseParams):
     name: str | None = Field(
         default=None, description="Members where name contains term specified"
