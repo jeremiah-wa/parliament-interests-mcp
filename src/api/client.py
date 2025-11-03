@@ -123,20 +123,3 @@ class ParliamentAPIClient:
     async def get_debate(self, debate_section_ext_id: str) -> Debate:
         response = await self._make_request(f"{self.hansard_url}/Debates/Debate/{debate_section_ext_id}.json")
         return Debate.model_validate(response)
-
-
-async def main():
-    # from src.api.rag import loader, vectorstore
-    # from langchain_community.vectorstores.utils import filter_complex_metadata
-    client = ParliamentAPIClient()
-    params = LordsInterestsRegisterParams(searchTerm="May")
-    result = await client.get_lords_interests(params)
-    # result = await client.get_debate("F2CE6BA1-3CA1-4032-9398-E07D35A35F95")
-    # documents = loader.debate_to_documents(result)
-    # filtered_documents = filter_complex_metadata(documents)
-    # vectorstore.add_documents(filtered_documents)
-    print(result)
-
-if __name__ == "__main__":
-    import asyncio
-    asyncio.run(main())
