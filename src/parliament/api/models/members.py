@@ -240,7 +240,13 @@ class RegisteredInterest(BaseAPIModel):
     deleted_when: datetime | None = Field(default=None, alias="deletedWhen", description="Deleted when")
     is_correction: bool = Field(default=False, alias="isCorrection", description="Is correction")
     child_interests: list["RegisteredInterest"] | None = Field(default=None, alias="childInterests", description="Child interests")
-    
+
+class Staff(BaseAPIModel):
+    """Staff model from Members API."""
+    surname: str | None = Field(default=None, description="Surname of the staff")
+    forename: str | None = Field(default=None, description="Forename of the staff")
+    title: str | None = Field(default=None, description="Title of the staff")
+    details: str | None = Field(default=None, description="Details of the staff")
     
 
 class RegisteredInterestCategory(BaseAPIModel):
@@ -255,7 +261,11 @@ class MembersInterests(BaseAPIModel):
     """Members interests model from Members API."""
     member: Member | None = Field(default=None, description="Member")
     interest_categories: list[RegisteredInterestCategory] | None = Field(default=None, alias="interestCategories", description="Interest categories")
-    
+
+class MembersStaff(BaseAPIModel):
+    """Members staff model from Members API."""
+    member: Member | None = Field(default=None, description="Member")
+    staff: list[Staff] | None = Field(default=None, description="Staff")   
 
 G = TypeVar("G", bound=BaseAPIModel)
 
@@ -278,6 +288,8 @@ class DebateContributionItem(Item[DebateContribution]):
 class MembersInterestsItem(Item[MembersInterests]):
     """Wrapper for member interests data."""
 
+class MembersStaffItem(Item[MembersStaff]):
+    """Wrapper for member staff data."""
 
 T = TypeVar("T", bound=BaseAPIModel)
 
@@ -316,12 +328,21 @@ class MembersInterestsMembersServiceSearchResult(MembersServiceSearchResult[Memb
     """Search result for members interests from Members API."""
 
 
+class MembersStaffMembersServiceSearchResult(MembersServiceSearchResult[MembersStaffItem]):
+    """Search result for members staff from Members API."""
+
+
 class LordsInterestsRegisterParams(BaseAPIModel):
     search_term: str | None = Field(default=None, alias="searchTerm", description="Registered interests containing search term")
-    page: int | None = Field(default=None, description="Page of results to return, default 0. Results per page 20.r")
+    page: int | None = Field(default=None, description="Page of results to return, default 0. Results per page 20")
     include_deleted: bool = Field(default=False, alias="includeDeleted", description="Registered interests that have been deleted")
 
+
+class LordsInterestsStaffParams(BaseAPIModel):
+    search_term: str | None = Field(default=None, alias="searchTerm", description="Staff containing search term")
+    page: int | None = Field(default=None, description="Page of results to return, default 0. Results per page 20")
     
+
 class MemberSearchParams(BaseParams):
     name: str | None = Field(
         default=None, description="Members where name contains term specified"

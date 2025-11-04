@@ -8,9 +8,9 @@ from langchain_core.document_loaders.base import BaseLoader
 from langchain_core.documents import Document
 from langchain_community.vectorstores.utils import filter_complex_metadata
 
-from src.api.client import ParliamentAPIClient
-from src.api.models.debates import Debate, DebateOverview, DebateItem
-from src.api.models.base import BaseAPIModel
+from src.parliament.api.client import ParliamentAPIClient
+from src.parliament.api.models.debates import Debate, DebateOverview, DebateItem
+from src.parliament.api.models.base import BaseAPIModel
 
 logger = logging.getLogger(__name__)
 

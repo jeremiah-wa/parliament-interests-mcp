@@ -5,22 +5,24 @@ from pydantic import Field
 from mcp.server.fastmcp import FastMCP
 
 
-from src.api.client import ParliamentAPIClient
-from src.api.models.interests import (
+from src.parliament.api.client import ParliamentAPIClient
+from src.parliament.api.models.interests import (
     InterestsParams,
     PublishedInterestApiLinkedSearchResult,
     PublishedCategoryApiLinkedSearchResult,
 )
-from src.api.models.members import (
+from src.parliament.api.models.members import (
     MemberSearchParams,
     MemberMembersServiceSearchResult,
     BaseParams,
     DebateContributionMembersServiceSearchResult,
     LordsInterestsRegisterParams,
-    MembersInterestsMembersServiceSearchResult
+    LordsInterestsStaffParams,
+    MembersInterestsMembersServiceSearchResult,
+    MembersStaffMembersServiceSearchResult
 )
-from src.api.models.debates import Debate
-from src.api.rag import (
+from src.parliament.api.models.debates import DebateResponse
+from src.parliament.rag import (
     vectorstore, 
     loader,
     DebateSearchParams,
@@ -97,6 +99,30 @@ async def get_lords_interests(
         Search specific lords interests: get_lords_interests(params={"searchTerm": "Baroness May of Maidenhead"})
     """
     result = await client.get_lords_interests(params)
+    return result
+
+@mcp.tool()
+async def get_lords_staff(
+    params: LordsInterestsStaffParams | None = None,
+) -> MembersStaffMembersServiceSearchResult:
+    """Get staff information for members of the House of Lords.
+    
+    Retrieves details about staff members employed by Lords, including their names,
+    titles, and employment details.
+    
+    Args:
+        params: Optional search parameters:
+            - search_term: Search for staff by name or details
+            - page: Page number for pagination (20 results per page)
+    
+    Returns:
+        Paginated list of Lords and their staff members
+    
+    Example:
+        Search for specific staff: get_lords_staff(params={"searchTerm": "Smith"})
+        Get all staff: get_lords_staff()
+    """
+    result = await client.get_lords_staff(params)
     return result
 
 @mcp.tool()
@@ -179,10 +205,12 @@ async def get_member_contribution_summary(
     
     return result
 
+
+
 @mcp.tool()
 async def get_debate(
     debate_id: str = Field(description="Debate section external ID specified"),
-):
+) -> DebateResponse:
     """Get the full content and details of a specific parliamentary debate.
     
     Retrieves the complete debate record including all speeches, interventions,
@@ -202,10 +230,13 @@ async def get_debate(
     Example:
         Get specific debate: get_debate(debate_id="F2CE6BA1-3CA1-4032-9398-E07D35A35F95")
     """
+    # Debate.model_rebuild()
     result = await client.get_debate(debate_id)
     documents = loader.debate_to_documents(result)
     vectorstore.add_documents(documents)
-    return result.model_dump_json()
+    return DebateResponse(
+        debate=result
+    )
 
 @mcp.tool()
 async def search_debates(

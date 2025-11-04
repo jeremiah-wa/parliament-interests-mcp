@@ -6,7 +6,7 @@ https://hansard-api.parliament.uk/swagger/docs/v1
 """
 
 from datetime import datetime
-from pydantic import Field
+from pydantic import Field, field_validator
 from enum import Enum
 from typing import Literal
 
@@ -28,7 +28,7 @@ class DebateOverview(BaseAPIModel):
     hrs_tag: str = Field(alias="HRSTag", description="HRS tag")
     date: datetime = Field(alias="Date", description="Debate date")
     location: str = Field(alias="Location", description="Location")
-    house: str = Field( alias="House", description="House (Commons/Lords)")
+    house: str = Field(alias="House", description="House (Commons/Lords)")
     source: Source = Field(alias="Source", description="Source of the debate")
     volume_no: int | None = Field(
         default=None, alias="VolumeNo", description="Volume number"
@@ -56,6 +56,18 @@ class DebateOverview(BaseAPIModel):
     previous_debate_title: str | None = Field(
         default=None, alias="PreviousDebateTitle", description="Previous debate title"
     )
+
+    @field_validator("date", "content_last_updated", mode="before")
+    @classmethod
+    def parse_date_string(cls, value):
+        """Convert date-only strings to datetime format."""
+        if value is None:
+            return None
+        if isinstance(value, str):
+            # If the string is just a date (YYYY-MM-DD), append time component
+            if len(value) == 10 and value.count("-") == 2:
+                return f"{value}T00:00:00"
+        return value
 
 
 class SectionTreeItem(BaseAPIModel):
@@ -115,6 +127,18 @@ class DebateItem(BaseAPIModel):
         default=None, alias="IsReiteration", description="Whether this is a reiteration"
     )
 
+    @field_validator("timecode", mode="before")
+    @classmethod
+    def parse_date_string(cls, value):
+        """Convert date-only strings to datetime format."""
+        if value is None:
+            return None
+        if isinstance(value, str):
+            # If the string is just a date (YYYY-MM-DD), append time component
+            if len(value) == 10 and value.count("-") == 2:
+                return f"{value}T00:00:00"
+        return value
+
 
 class Debate(BaseAPIModel):
     """Complete debate record with overview, navigation, and items."""
@@ -122,12 +146,16 @@ class Debate(BaseAPIModel):
     overview: DebateOverview | None = Field(
         default=None, alias="Overview", description="Overview of the debate"
     )
-    navigator: list[SectionTreeItem] | None = Field(
-        default=None, alias="Navigator", description="Navigation tree"
+    navigator: list[SectionTreeItem] = Field(
+        default_factory=list, alias="Navigator", description="Navigation tree"
     )
-    items: list[DebateItem] | None = Field(
-        default=None, alias="Items", description="Debate items"
+    items: list[DebateItem] = Field(
+        default_factory=list, alias="Items", description="Debate items"
     )
-    child_debates: list["Debate"] | None = Field(
-        default=None, alias="ChildDebates", description="Child debates"
+    child_debates: list["Debate"] = Field(
+        default_factory=list, alias="ChildDebates", description="Child debates"
     )
+
+class DebateResponse(BaseAPIModel):
+    """Debate response for MCP tools (non-recursive version)."""
+    debate: Debate | None = Field(default=None, alias="Debate", description="Debate")

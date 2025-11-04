@@ -16,18 +16,12 @@ class BaseAPIModel(BaseModel):
         return None if value == "None" else value
 
 
-class BaseParams(BaseModel):
+class BaseParams(BaseAPIModel):
     skip: int = Field(
         default=0, ge=0, description="Number of records to skip", alias="Skip"
     )
     take: int = Field(
         default=20, ge=1, le=20, description="Number of records to return", alias="Take"
-    )
-
-    model_config = ConfigDict(
-        extra="ignore",
-        validate_by_name=True,
-        validate_by_alias=True
     )
 
 

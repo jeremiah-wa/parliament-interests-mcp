@@ -10,20 +10,22 @@ from tenacity import (
     retry_if_exception_type,
     before_sleep_log,
 )
-from src.api.models.base import BaseParams
-from src.api.models.interests import (
+from src.parliament.api.models.base import BaseParams
+from src.parliament.api.models.interests import (
     InterestsParams,
     PublishedInterestApiLinkedSearchResult,
     PublishedCategoryApiLinkedSearchResult,
 )
-from src.api.models.members import (
+from src.parliament.api.models.members import (
     MemberMembersServiceSearchResult,
     MemberSearchParams,
     DebateContributionMembersServiceSearchResult,
     MembersInterestsMembersServiceSearchResult,
+    MembersStaffMembersServiceSearchResult,
     LordsInterestsRegisterParams,
+    LordsInterestsStaffParams,
 )
-from src.api.models.debates import Debate
+from src.parliament.api.models.debates import Debate
 
 # Note: Logging configuration is handled in server.py to avoid conflicts
 logger = logging.getLogger(__name__)
@@ -88,6 +90,13 @@ class ParliamentAPIClient:
             params=params.model_dump(by_alias=True, exclude_none=True) if params else None
         )
         return MembersInterestsMembersServiceSearchResult.model_validate(response)
+    
+    async def get_lords_staff(self, params: LordsInterestsStaffParams | None = None) -> MembersStaffMembersServiceSearchResult:
+        response = await self._make_request(
+            f"{self.members_url}/LordsInterests/Staff",
+            params=params.model_dump(by_alias=True, exclude_none=True) if params else None
+        )
+        return MembersStaffMembersServiceSearchResult.model_validate(response)
 
     async def get_categories(
         self, params: BaseParams | None = None
