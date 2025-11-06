@@ -5,13 +5,13 @@ from pydantic import Field
 from mcp.server.fastmcp import FastMCP
 
 
-from src.parliament.api.client import ParliamentAPIClient
-from src.parliament.api.models.interests import (
+from src.api.client import ParliamentAPIClient
+from src.api.models.interests import (
     InterestsParams,
     PublishedInterestApiLinkedSearchResult,
     PublishedCategoryApiLinkedSearchResult,
 )
-from src.parliament.api.models.members import (
+from src.api.models.members import (
     MemberSearchParams,
     MemberMembersServiceSearchResult,
     BaseParams,
@@ -21,8 +21,8 @@ from src.parliament.api.models.members import (
     MembersInterestsMembersServiceSearchResult,
     MembersStaffMembersServiceSearchResult
 )
-from src.parliament.api.models.debates import DebateResponse
-from src.parliament.rag import (
+from src.api.models.debates import DebateResponse
+from src.rag import (
     vectorstore, 
     loader,
     DebateSearchParams,
@@ -39,7 +39,7 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
-mcp = FastMCP(name="parliament-interests")
+mcp = FastMCP(name="parliament")
 
 client = ParliamentAPIClient()
 

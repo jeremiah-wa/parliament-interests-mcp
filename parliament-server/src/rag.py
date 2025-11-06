@@ -1,16 +1,13 @@
 import logging
-from typing import TypeVar
-from pydantic import ConfigDict, Field, model_validator, create_model
-# from langchain_huggingface  import HuggingFaceEmbeddings
-# from langchain_core.vectorstores import InMemoryVectorStore
+from pydantic import Field, model_validator, create_model
 from langchain_chroma import Chroma
 from langchain_core.document_loaders.base import BaseLoader
 from langchain_core.documents import Document
 from langchain_community.vectorstores.utils import filter_complex_metadata
 
-from src.parliament.api.client import ParliamentAPIClient
-from src.parliament.api.models.debates import Debate, DebateOverview, DebateItem
-from src.parliament.api.models.base import BaseAPIModel
+from src.api.client import ParliamentAPIClient
+from src.api.models.debates import Debate, DebateOverview, DebateItem
+from src.api.models.base import BaseAPIModel
 
 logger = logging.getLogger(__name__)
 

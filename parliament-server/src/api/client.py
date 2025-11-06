@@ -10,13 +10,13 @@ from tenacity import (
     retry_if_exception_type,
     before_sleep_log,
 )
-from src.parliament.api.models.base import BaseParams
-from src.parliament.api.models.interests import (
+from src.api.models.base import BaseParams
+from src.api.models.interests import (
     InterestsParams,
     PublishedInterestApiLinkedSearchResult,
     PublishedCategoryApiLinkedSearchResult,
 )
-from src.parliament.api.models.members import (
+from src.api.models.members import (
     MemberMembersServiceSearchResult,
     MemberSearchParams,
     DebateContributionMembersServiceSearchResult,
@@ -25,7 +25,7 @@ from src.parliament.api.models.members import (
     LordsInterestsRegisterParams,
     LordsInterestsStaffParams,
 )
-from src.parliament.api.models.debates import Debate
+from src.api.models.debates import Debate
 
 # Note: Logging configuration is handled in server.py to avoid conflicts
 logger = logging.getLogger(__name__)
