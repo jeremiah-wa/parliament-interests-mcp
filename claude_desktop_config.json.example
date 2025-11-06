@@ -1,0 +1,36 @@
+{
+  "mcpServers": {
+    "parliament": {
+      "command": "c:\\Users\\Wajer\\.local\\bin\\uv.exe",
+      "args": [
+        "run",
+        "--directory",
+        "C:\\Users\\Wajer\\CascadeProjects\\parliament-interests-mcp",
+        "--with",
+        "mcp[cli]",
+        "mcp",
+        "run",
+        "parliament-server\\src\\server.py"
+      ],
+      "env": {},
+      "disabled": false
+    },
+    "companies-house": {
+      "command": "c:\\Users\\Wajer\\.local\\bin\\uv.exe",
+      "args": [
+        "run",
+        "--directory",
+        "C:\\Users\\Wajer\\CascadeProjects\\parliament-interests-mcp",
+        "--with",
+        "mcp[cli]",
+        "mcp",
+        "run",
+        "companies-server\\src\\server.py"
+      ],
+      "env": {
+        "COMPANY_API_KEY": "your-api-key-here"
+      },
+      "disabled": false
+    }
+  }
+}

@@ -5,4 +5,4 @@ __pycache__
 uv.lock
 chromadb
 .env
-./claude_desktop_config.json
+claude_desktop_config.json
