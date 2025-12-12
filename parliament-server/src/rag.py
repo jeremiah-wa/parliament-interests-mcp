@@ -1,12 +1,13 @@
 import logging
-from pydantic import Field, model_validator, create_model
+from datetime import datetime
+from pydantic import Field, model_validator
 from langchain_chroma import Chroma
 from langchain_core.document_loaders.base import BaseLoader
 from langchain_core.documents import Document
 from langchain_community.vectorstores.utils import filter_complex_metadata
 
 from src.api.client import ParliamentAPIClient
-from src.api.models.debates import Debate, DebateOverview, DebateItem
+from src.api.models.debates import Debate, DebateOverview, DebateItem, Source
 from src.api.models.base import BaseAPIModel
 
 logger = logging.getLogger(__name__)
@@ -160,14 +161,18 @@ class WhereDocument(BaseAPIModel):
         return self.model_dump(mode='json', by_alias=True, exclude_none=True)
 
 
-DebateSearchParams = create_model(
-    'DebateSearchParams',
-    __base__=DebateDocumentMetadata,
-    **{
-        field: (info.annotation | None, Field(default=None, alias=info.alias, description=info.description)) 
-        for field, info in DebateDocumentMetadata.model_fields.items()
-    },
-)
+class DebateSearchParams(DebateDocumentMetadata):
+    """Search parameters for filtering debates. All fields optional."""
+    
+    # DebateOverview required fields - redeclared as optional
+    id: int | None = Field(default=None, alias="Id", description="Debate ID")
+    ext_id: str | None = Field(default=None, alias="ExtId", description="External ID")
+    title: str | None = Field(default=None, alias="Title", description="Debate title")
+    hrs_tag: str | None = Field(default=None, alias="HRSTag", description="HRS tag")
+    date: datetime | None = Field(default=None, alias="Date", description="Debate date")
+    location: str | None = Field(default=None, alias="Location", description="Location")
+    house: str | None = Field(default=None, alias="House", description="House (Commons/Lords)")
+    source: Source | None = Field(default=None, alias="Source", description="Source of the debate")
 
 
 class DocumentAPIModel(BaseAPIModel):
